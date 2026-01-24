@@ -7,6 +7,37 @@ built on Azure using **Databricks Delta Live Tables (DLT)** and **ADLS Gen2**.
 
 ## 🏗 Architecture Overview
 
+┌──────────────┐        ┌────────────────────┐
+│   GitHub     │        │  Azure Data Factory │
+│ (Code Repo)  │        │  (Ingestion)        │
+└──────┬───────┘        └─────────┬──────────┘
+       │                          │
+       --------------▼            ▼
+                ┌──────────────────────────┐
+                │   BRONZE (Raw Layer)     │
+                │   ADLS Gen2 + Delta      │
+                │   Incremental Load       │
+                └──────────┬───────────────┘
+                           ▼
+        ┌────────────────────────────────────────┐
+        │        DELTA LIVE TABLES (DLT)         │
+        │                                        │
+        │  ┌──────────────┐   ┌──────────────┐   │
+        │  │ SILVER       │ → │ GOLD         │   │
+        │  │ Cleaned &    │   │ Star Schema  │   │
+        │  │ Transformed  │   │ Serving Layer│   │
+        │  └──────────────┘   └──────────────┘   │
+        └───────────┬────────────────────────────┘
+                    │
+          ┌─────────┴─────────┐
+          │                   │
+          ▼                   ▼
+ ┌────────────────┐   ┌────────────────┐
+ │ Azure Synapse  │   │ Power BI       │
+ │ (Warehouse)    │   │ (Reporting)    │
+ └────────────────┘   └────────────────┘
+
+
 The pipeline follows the **Medallion Architecture** pattern:
 
 - **Bronze Layer** – Raw incremental data ingestion
